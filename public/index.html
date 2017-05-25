@@ -9,7 +9,7 @@
 	<script type="text/javascript" src="angular-cookies.js"></script>
 	
 	<script type="text/javascript">
-		var app = angular.module('mittens',['ngRoute']);
+		var app = angular.module('mittens',['ngRoute','ngCookies']);
 
 app.config(function($routeProvider, $locationProvider) {
 	$routeProvider
@@ -23,12 +23,27 @@ app.config(function($routeProvider, $locationProvider) {
 });   
   });
 
-		app.controller('HomeController', function($scope,$http){	
+$scope.signin=function(){
+$http.put('/users/signin',{ username: $scope.username,password: $scope.password})
+.then(function(res){
+	$cookies.put('token',res.data.token);
+	$cookies.put('currentUser',$scope.username);
+	$rootScope.token=res.data.token;
+	$rootScope.currentUser=$scope.username;
+	alert('successfully signed in');
+}, function(err){
+	alert('Bad login credentials');
+});
+};
+
+		app.controller('HomeController', function($rootscope,$scope,$http,$cookies){	
 function getMeows(){
+	console.log('hello12');
 		$http.get('/meows').then(function(responce){
+			console.log('hello');
 				$scope.chait=responce.data;
 			});			
-}
+};
 getMeows();
 	$scope.submitNewMeow=function(){
 				$http.post('/meows',{ newMeow: $scope.newMeow}).then(function(){
@@ -43,11 +58,34 @@ getMeows();
 			});
 		};
 
+$scope.signin=function(){
+$http.put('/users/signin',{ username: $scope.username,password: $scope.password})
+.then(function(res){
+	$cookies.put('token',res.data.token);
+	$cookies.put('currentUser',$scope.username);
+	$rootScope.token=res.data.token;
+	$rootScope.currentUser=$scope.username;
+	alert('successfully signed in');
+}, function(err){
+	alert('Bad login credentials');
+});
+};
 		});
 
 app.controller('SignupController', function($scope,$http){
 	
+//	console.log('You are on the Signup Page');
+	$scope.submitSignup=function(){
+var newUser= {
+	username: $scope.username,
+	password: $scope.password
+};		
+$http.post('/users',newUser).then(function(){
+				alert('Success');
+			});
+	};
 	console.log('You are on the Signup Page');
+
 });
 	</script>
 </head>
